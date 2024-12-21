@@ -3,19 +3,18 @@ import { message } from 'ant-design-vue'
 
 // 创建axios实例
 const api = axios.create({
-  baseURL: 'http://localhost:5001',
-  withCredentials: true,  // 允许跨域请求携带凭证
-  timeout: 10000,  // 设置超时时间
+  baseURL: '/api',  // 添加 /api 前缀，这样请求会被 Vite 代理
+  withCredentials: false,
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   }
 })
 
-// 添加请求拦截器
+// 请求拦截器
 api.interceptors.request.use(
   config => {
-    // 在发送请求之前做些什么
     console.log('发送请求:', config.url)
     return config
   },
@@ -26,14 +25,21 @@ api.interceptors.request.use(
   }
 )
 
-// 添加响应拦截器
+// 响应拦截器
 api.interceptors.response.use(
   response => {
-    // 对响应数据做点什么
     console.log('收到响应:', response.data)
     return response
   },
   error => {
+    // 处理 511 错误
+    if (error.response && error.response.status === 511) {
+      // 在新窗口打开 localtunnel URL 让用户确认
+      window.open(error.response.headers.location || api.defaults.baseURL, '_blank')
+      message.warning('请在新窗口中确认访问权限，然后重试')
+      return Promise.reject(new Error('请确认访问权限后重试'))
+    }
+
     console.error('请求失败:', error)
     
     if (error.response) {

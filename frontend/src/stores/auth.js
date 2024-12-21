@@ -10,7 +10,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const getQRCode = async () => {
     try {
-      const response = await api.get('/api/wechat/get_qr_code')
+      const response = await api.get('/wechat/get_qr_code')
       qrCodeUrl.value = response.data.qr_code_url
       scene.value = response.data.scene
       startPolling()
@@ -21,7 +21,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const checkLoginStatus = async () => {
     try {
-      const response = await api.post('/api/wechat/check_login', {
+      const response = await api.post('/wechat/check_login', {
         scene: scene.value
       })
       
@@ -59,7 +59,6 @@ export const useAuthStore = defineStore('auth', () => {
     qrCodeUrl,
     scene,
     getQRCode,
-    checkLoginStatus,
     logout
   }
 })
